@@ -11,7 +11,26 @@ import {
   getVideoEntity,
 } from "./utils";
 
+function preloadVideo(videoSrc) {
+  const video = new Audio(videoSrc);
+  video.preload = "auto";
+  video.load();
+}
+
 document.addEventListener("DOMContentLoaded", function () {
+  const videoPaths = [
+    "./assets/videos/video-1.mp4",
+    "./assets/videos/video-2.mp4",
+    "./assets/videos/video-3.mp4",
+    "./assets/videos/video-4.mp4",
+    "./assets/videos/video-5.mp4",
+    "./assets/videos/video-6.mp4",
+  ];
+  // Предзагрузка каждого видеофайла
+  videoPaths.forEach((videoPath) => {
+    preloadVideo(videoPath);
+  });
+
   // eslint-disable-next-line no-undef
   AFRAME.registerComponent("birthday-party", {
     init() {
