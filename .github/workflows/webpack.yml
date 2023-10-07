@@ -2,27 +2,47 @@ name: Deploy
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * *'
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  deploy:
+    name: Deploy Site
     strategy:
       matrix:
-        node-version: [14.x]
-
+        os: [ubuntu-latest]
+        node-version: [latest]
+    runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: yarn
 
-    - name: Build
-      run: |
-        npm install
-        npx webpack
+      - name: Enable webpack persistent caching
+        uses: actions/cache@v3
+        id: build-webpack-persistent-cache
+        with:
+          path: node_modules/.cache
+          key: build-${{ hashFiles('**/webpack.*.mjs') }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |-
+             build-${{ hashFiles('**/webpack.*.mjs') }}-${{ hashFiles('**/yarn.lock') }}
+             build-${{ hashFiles('**/webpack.*.mjs') }}-
+      - run: yarn --frozen-lockfile
+      - name: Build site
+        run: yarn build
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          OPENCOLLECTIVE_API_KEY: ${{secrets.OPENCOLLECTIVE_API_KEY}}
+      - run: yarn lint:links
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          folder: dist
+          clean: true
