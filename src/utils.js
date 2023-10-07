@@ -1,4 +1,8 @@
 export const getFlameEntity = (flame) => {
+  if (!flame) {
+    return null;
+  }
+
   const flameEl = document.createElement("a-entity");
   flameEl.setAttribute("obj-model", {
     mtl: "#flame-mtl",
@@ -18,6 +22,9 @@ export const getFlameEntity = (flame) => {
   return flameEl;
 };
 export const getVideoEntity = (video, id) => {
+  if (!video) {
+    return null;
+  }
   const parentEl = document.createElement("a-entity");
   parentEl.setAttribute("position", video.position);
   parentEl.setAttribute("rotation", video.rotation);
