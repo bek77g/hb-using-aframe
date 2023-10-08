@@ -52,9 +52,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const videoEntity = getVideoEntity(videosObj[key], `video-${key}`);
         tvContainerEl.appendChild(videoEntity);
       });
-
-      // const textEl = getTextEntity(config.name);
-      // sceneEl.appendChild(textEl);
       const ageEl = getAgeEntity(config.age);
       sceneEl.appendChild(ageEl);
     },
